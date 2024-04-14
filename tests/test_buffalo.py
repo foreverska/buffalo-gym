@@ -6,3 +6,5 @@ def test_buffalo():
 
     env.reset()
     env.step(env.action_space.sample())
+
+    assert 1
