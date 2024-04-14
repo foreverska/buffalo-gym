@@ -19,6 +19,21 @@ distribution (0, 1) and added to the chosen arm center
 value.  This is not intended to be challenging for an agent but 
 easy for the debugger to reason about.
 
+## Multi-Buffalo ("MultiBuffalo-v0")
+
+This serves as a contextual bandit implementation.  It is a 
+k-armed bandit with n states.  These states are indicated to 
+the agent in the observation and the two states have different 
+reward offsets for each arm.  The goal of the agent is to 
+learn and contextualize best action for a given state.  This is 
+a good stepping stone to Markov Decision Processes.
+
+This module had an extra parameter, pace.  By default (None), a 
+new state is chosen for every step of the environment.  It can 
+be set to any integer to determine how many steps between randomly 
+choosing a new state.  Of course, transitioning to a new state is 
+not guaranteed as the next state is random.
+
 ## Using
 
 Install via pip and import buffalo_gym along with gymnasium.
