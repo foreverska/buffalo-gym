@@ -8,6 +8,9 @@ ActType = TypeVar("ActType")
 
 
 class BuffaloEnv(gym.Env):
+    """
+    Standard multi-armed bandit environment with static reward distributions.
+    """
     metadata = {'render_modes': []}
 
     def __init__(self, arms: int = 10):
@@ -16,7 +19,7 @@ class BuffaloEnv(gym.Env):
         :param arms: number of arms
         """
         self.action_space = gym.spaces.Discrete(arms)
-        self.observation_space = gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.int64)
+        self.observation_space = gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32)
 
         self.offsets = np.random.normal(0, arms, (arms,))
 
@@ -31,7 +34,7 @@ class BuffaloEnv(gym.Env):
         :return: observation, info
         """
 
-        return np.zeros((1,), dtype=np.int64), {}
+        return np.zeros((1,), dtype=np.float32), {}
 
     def step(self, action: int) -> tuple[ObsType, SupportsFloat, bool, bool, dict[str, Any]]:
         """
@@ -41,4 +44,4 @@ class BuffaloEnv(gym.Env):
         """
         reward = np.random.normal(0, 1, 1)[0] + self.offsets[action]
 
-        return np.zeros((1,), dtype=np.int64), reward, False, False, {}
+        return np.zeros((1,), dtype=np.float32), reward, False, False, {}
