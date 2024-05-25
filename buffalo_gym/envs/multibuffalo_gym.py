@@ -44,7 +44,7 @@ class MultiBuffaloEnv(gym.Env):
         self.state = 0
         self.ssr = 0
 
-        return np.zeros((1,), dtype=np.float32), {}
+        return np.zeros((1,), dtype=np.float32), {'offsets': self.offsets}
 
     def step(self, action: int) -> tuple[ObsType, SupportsFloat, bool, bool, dict[str, Any]]:
         """
@@ -57,4 +57,4 @@ class MultiBuffaloEnv(gym.Env):
         if self.pace is None or self.ssr % self.pace == 0:
             self.state = random.randint(0, self.states - 1)
 
-        return np.ones((1,), dtype=np.float32)*self.state, reward, False, False, {}
+        return np.ones((1,), dtype=np.float32)*self.state, reward, False, False, {'offsets': self.offsets}

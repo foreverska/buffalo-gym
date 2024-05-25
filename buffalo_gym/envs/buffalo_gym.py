@@ -34,7 +34,7 @@ class BuffaloEnv(gym.Env):
         :return: observation, info
         """
 
-        return np.zeros((1,), dtype=np.float32), {}
+        return np.zeros((1,), dtype=np.float32), {"offsets": self.offsets}
 
     def step(self, action: int) -> tuple[ObsType, SupportsFloat, bool, bool, dict[str, Any]]:
         """
@@ -44,4 +44,4 @@ class BuffaloEnv(gym.Env):
         """
         reward = np.random.normal(0, 1, 1)[0] + self.offsets[action]
 
-        return np.zeros((1,), dtype=np.float32), reward, False, False, {}
+        return np.zeros((1,), dtype=np.float32), reward, False, False, {"offsets": self.offsets}

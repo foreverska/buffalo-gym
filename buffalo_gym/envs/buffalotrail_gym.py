@@ -53,7 +53,7 @@ class BuffaloTrailEnv(gym.Env):
         self.state = 0
         self.visited = [0]
 
-        return np.zeros((1,), dtype=np.float32), {'goal': self.goal_sequence}
+        return np.zeros((1,), dtype=np.float32), {'goal': self.goal_sequence, 'offsets': self.offsets}
 
     def step(self, action: int) -> tuple[ObsType, SupportsFloat, bool, bool, dict[str, Any]]:
         """
@@ -69,4 +69,5 @@ class BuffaloTrailEnv(gym.Env):
         if self.visited == self.goal_sequence:
             reward = 100
 
-        return np.ones((1,), dtype=np.float32)*action, reward, False, False, {}
+        return np.ones((1,), dtype=np.float32)*action, reward, False, False, {'goal': self.goal_sequence,
+                                                                              'offsets': self.offsets}
