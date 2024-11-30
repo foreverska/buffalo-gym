@@ -7,7 +7,7 @@ setup(
     description="Buffalo Gym environment",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    version="0.0.3",
+    version="0.1.0",
     author="foreverska",
     install_requires=["gymnasium>=0.26.0", "numpy"],
     keywords="gymnasium, gym",

@@ -10,7 +10,7 @@ and write an MAB to debug my DQN agent.  But there was a lack
 of native gymnasium environments, so I wrote Buffalo, an easy-to-use 
  environment that it might help someone else.
 
-## Buffalo ("Buffalo-v0")
+## Buffalo ("Buffalo-v0" | "Bandit-v0")
 
 Default multi-armed bandit environment.  Arm center values 
 are drawn from a normal distribution (0, arms).  When an 
@@ -19,7 +19,7 @@ distribution (0, 1) and added to the chosen arm center
 value.  This is not intended to be challenging for an agent but 
 easy for the debugger to reason about.
 
-## Multi-Buffalo ("MultiBuffalo-v0")
+## Multi-Buffalo ("MultiBuffalo-v0" | "ContextualBandit-v0")
 
 This serves as a contextual bandit implementation.  It is a 
 k-armed bandit with n states.  These states are indicated to 
@@ -34,9 +34,10 @@ be set to any integer to determine how many steps between randomly
 choosing a new state.  Of course, transitioning to a new state is 
 not guaranteed as the next state is random.
 
-## Buffalo Trail ("BuffaloTrail-v0")
+## Buffalo Trail ("BuffaloTrail-v0" | "StatefulBandit-v0")
 
-There is a pervasive rumor that slot machine manufacturers put in 
+This serves as a stateful bandit implementation.  There is a 
+pervasive rumor that slot machine manufacturers put in 
 a secret sequence of bets which trigger a large reward or the 
 jackpot.  It is almost certainly not true in the real world but 
 it is here.  A sequence of actions gives the max reward.  The 

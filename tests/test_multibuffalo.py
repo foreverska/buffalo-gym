@@ -13,7 +13,7 @@ def test_multibuffalo():
     assert obs[0] in (0, 1)
 
     states = []
-    for _ in range(10):
+    for _ in range(20):
         obs, reward, done, term, info = env.step(env.action_space.sample())
 
         assert obs.shape == (1,)
@@ -26,7 +26,7 @@ def test_multibuffalo():
     assert set(states) == {0, 1}
 
 def test_multibuffalo_threestates():
-    env = gym.make('MultiBuffalo-v0', states=3)
+    env = gym.make('MultiBuffalo-v0', states=3, pace=2)
 
     obs, info = env.reset()
 
@@ -35,7 +35,7 @@ def test_multibuffalo_threestates():
     assert obs[0] in (0, 1, 2)
 
     states = []
-    for _ in range(10):
+    for _ in range(20):
         obs, reward, done, term, info = env.step(env.action_space.sample())
 
         assert obs.shape == (1,)
