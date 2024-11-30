@@ -14,21 +14,63 @@ class MultiBuffaloEnv(gym.Env):
     """
     metadata = {'render_modes': []}
 
-    def __init__(self, arms: int = 10, states: int = 2, pace: int | None = None):
+    def __draw_arms(self):
+        """
+        Draw new arms
+        """
+        self.rng = np.random.default_rng(self.seed)
+        self.offsets = np.random.uniform(self.min_suboptimal_mean, self.max_suboptimal_mean,
+                                         size=(1, self.states, self.arms))
+
+        self.stds = []
+        for state in range(self.states):
+            optimal_arms = self.rng.choice(range(self.arms), self.optimal_arms, replace=False)
+            for arm in optimal_arms:
+                self.offsets[0, state, arm] = self.optimal_mean
+            self.stds.append([self.optimal_std if arm in optimal_arms else self.suboptimal_std
+                              for arm in range(self.arms)])
+
+    def __init__(self, arms: int = 10, states: int = 2, optimal_arms: int | list[int] = 1,
+                 dynamic_rate: int | None = None, pace: int = 5, seed: int | None = None, optimal_mean: float = 10,
+                 optimal_std: float = 1, min_suboptimal_mean: float = 0, max_suboptimal_mean: float = 5,
+                 suboptimal_std: float = 1):
         """
         Multi-armed bandit environment with k arms and n states
         :param arms: number of arms
         :param states: number of states
-        :param pace: number of steps between state changes, None for every step
+        :param optimal_arms: number of optimal arms or list of optimal orms in each state
+        :param dynamic_rate: number of steps between drawing new arm means, None means no dynamic rate
+        :param seed: random seed
+        :param optimal_mean: mean of optimal arms
+        :param optimal_std: std of optimal arms
+        :param min_suboptimal_mean: min mean of suboptimal arms
+        :param max_suboptimal_mean: max mean of suboptimal arms
+        :param suboptimal_std: std of suboptimal arms
         """
-        self.action_space = gym.spaces.Discrete(arms)
-        self.observation_space = gym.spaces.Box(low=0, high=states, shape=(1,), dtype=np.float32)
-
-        self.offsets = np.random.normal(0, arms, (arms, states))
-        self.pace = pace
+        self.arms = arms
         self.states = states
-        self.state = 0
+        self.dynamic_rate = dynamic_rate
+        self.pace = pace
+        self.initial_seed = seed
+        self.seed = seed
+        self.optimal_mean = optimal_mean
+        self.optimal_std = optimal_std
+        self.min_suboptimal_mean = min_suboptimal_mean
+        self.max_suboptimal_mean = max_suboptimal_mean
+        self.suboptimal_std = suboptimal_std
+
+        if optimal_arms is list and len(optimal_arms) != self.arms:
+            raise ValueError("Optimal arms list must have equal number of arms")
+        self.optimal_arms = optimal_arms
+
+        self.action_space = gym.spaces.Discrete(arms)
+        self.observation_space = gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32)
+
+        self.pulls = 0
         self.ssr = 0
+        self.state = 0
+
+        self.__draw_arms()
 
     def reset(self,
               *,
@@ -41,10 +83,13 @@ class MultiBuffaloEnv(gym.Env):
         :return: observation, info
         """
 
-        self.state = 0
+        self.seed = self.initial_seed
+        self.pulls = 0
         self.ssr = 0
+        self.state = 0
+        self.__draw_arms()
 
-        return np.zeros((1,), dtype=np.float32), {'offsets': self.offsets}
+        return np.zeros((1,), dtype=np.float32), {"offsets": self.offsets}
 
     def step(self, action: int) -> tuple[ObsType, SupportsFloat, bool, bool, dict[str, Any]]:
         """
@@ -52,9 +97,16 @@ class MultiBuffaloEnv(gym.Env):
         :param action: arm to pull
         :return: observation, reward, done, term, info
         """
-        reward = np.random.normal(0, 1, 1)[0] + self.offsets[action, self.state]
+        reward = self.rng.normal(self.offsets[0][self.state][action], self.stds[self.state][action], 1)[0]
+
         self.ssr += 1
         if self.pace is None or self.ssr % self.pace == 0:
-            self.state = random.randint(0, self.states - 1)
+            self.state = np.random.randint(0, self.states)
+
+        self.pulls += 1
+        if self.dynamic_rate is not None and self.pulls % self.dynamic_rate == 0:
+            if self.seed is not None:
+                self.seed += 1
+            self.__draw_arms()
 
         return np.ones((1,), dtype=np.float32)*self.state, reward, False, False, {'offsets': self.offsets}
