@@ -13,7 +13,7 @@ def test_multibuffalo():
     assert obs[0] in (0, 1)
 
     states = []
-    for _ in range(10):
+    for _ in range(20):
         obs, reward, done, term, info = env.step(env.action_space.sample())
 
         assert obs.shape == (1,)
