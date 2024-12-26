@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.0] - 2024-12-26
+
+### Added
+
+- BounlessBuffalo -- InfiniteArmedBandit
+- DuelingBuffalo -- DuelingBandit
+- SymbolicState
+
+### Changed
+
+- BuffaloTrail more closely matches the notion of a bandit.  It was previously unconstrained on two axes 
+compared to a traditional bandit (control over future states and dependence on history).  Control over future 
+states was removed as dependence on history is interesting in its own right.
+
 ## [0.1.0] - 2024-11-29
 
 ### Added

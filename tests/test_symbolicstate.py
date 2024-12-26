@@ -3,8 +3,8 @@ import numpy as np
 import gymnasium as gym
 import buffalo_gym
 
-def test_multibuffalo():
-    env = gym.make('MultiBuffalo-v0')
+def test_symbolicstate():
+    env = gym.make('SymbolicStateBandit-v0')
 
     obs, info = env.reset()
 
@@ -26,10 +26,10 @@ def test_multibuffalo():
         if states == {0.0, 1.0}:
             break
 
-    assert states == {0.0, 1.0}
+    assert set(states) == {0.0, 1.0}
 
-def test_multibuffalo_threestates():
-    env = gym.make('MultiBuffalo-v0', states=3, pace=2)
+def test_symbolicstate_threestates():
+    env = gym.make('SymbolicStateBandit-v0', states=3, pace=2)
 
     obs, info = env.reset()
 
@@ -51,4 +51,4 @@ def test_multibuffalo_threestates():
         if states == {0.0, 1.0, 2.0}:
             break
 
-    assert states == {0.0, 1.0, 2.0}
+    assert set(states) == {0.0, 1.0, 2.0}

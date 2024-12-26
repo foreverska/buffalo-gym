@@ -10,7 +10,9 @@ and write an MAB to debug my DQN agent.  But there was a lack
 of native gymnasium environments, so I wrote Buffalo, an easy-to-use 
  environment that it might help someone else.
 
-## Buffalo ("Buffalo-v0" | "Bandit-v0")
+## Standard Bandit Problems
+
+### Buffalo ("Buffalo-v0" | "Bandit-v0")
 
 Default multi-armed bandit environment.  Arm center values 
 are drawn from a normal distribution (0, arms).  When an 
@@ -19,7 +21,7 @@ distribution (0, 1) and added to the chosen arm center
 value.  This is not intended to be challenging for an agent but 
 easy for the debugger to reason about.
 
-## Multi-Buffalo ("MultiBuffalo-v0" | "ContextualBandit-v0")
+### Multi-Buffalo ("MultiBuffalo-v0" | "ContextualBandit-v0")
 
 This serves as a contextual bandit implementation.  It is a 
 k-armed bandit with n states.  These states are indicated to 
@@ -34,17 +36,58 @@ be set to any integer to determine how many steps between randomly
 choosing a new state.  Of course, transitioning to a new state is 
 not guaranteed as the next state is random.
 
-## Buffalo Trail ("BuffaloTrail-v0" | "StatefulBandit-v0")
+### DuelingBuffalo ("DuelingBuffalo-v0" | "DuelingBandit-v0")
 
-This serves as a stateful bandit implementation.  There is a 
-pervasive rumor that slot machine manufacturers put in 
-a secret sequence of bets which trigger a large reward or the 
-jackpot.  It is almost certainly not true in the real world but 
-it is here.  A sequence of actions gives the max reward.  The 
-sequence is randomly chosen on environment setup and indicated 
-in the info of reset.  Not all sequences are aliased and this 
-may be an important thing to check in an implementation.  Therefore, 
-there is a rudimentary algorithm to force aliasing included.
+Yue et al. (2012) introduced the dueling bandit variant to model 
+situations with only relative feedback.  The agent pulls two levers 
+simultaneously; the feedback is whichever lever provides the best 
+reward.  This restriction means the agent cannot observe rewards 
+and must continually compare arms to determine the best.  Given 
+the reward-centric structure of gymnasium returns, we instead 
+give a reward of 1 if the first arm chosen was higher than the 
+second.  The agent must choose two arms, which cannot be the same.
+
+### BoundlessBuffalo ("BoundlessBuffalo-v0" | "InfiniteArmedBandit-v0")
+
+Built from the Wikipedia entry based on Agrawal, 1995 (Paywalled), 
+BoundlessBuffalo approximates the InfiniteArmedBandit problem.  
+The reward for this bandit is the action put into a polynomial of 
+degree n, with the coefficients randomly sampled from (-0.1, 0.1).  
+This environment tests the ability of an algorithm to find an optimal 
+input in a continuous space.  The dynamic drawing of new coefficients 
+challenges algorithms to adapt to a changing landscape continually.
+
+## Nonstandard Bandit Problems
+
+### Buffalo Trail ("BuffaloTrail-v0" | "StatefulBandit-v0")
+
+A Stateful Bandit builds on the Contextual Bandit by relaxing 
+the assumption that rewards depend only on the current state. 
+In this framework, the environment incorporates a memory of past 
+states, rewarding the maximum to an agent only if it encounters a 
+specific sequence of states and selects the correct action.
+
+This setup isolates an agent's ability to track history and infer 
+belief states, without introducing the confounding factor of 
+exploration, as the agent cannot control state transitions. Stateful 
+Bandits provide a targeted environment for studying history-dependent 
+decision-making and state estimation.
+
+### Symbolic State ("SymbolicStateBandit-v0")
+
+In real slots, the state of the bandit has little to no impact on 
+the underlying rewards.  Plenty of flashing lights and game modes 
+serve only to keep the player engaged.  This SymbolicStateBandit 
+(SSB) formulation simulates this.  The states do not correlate 
+with the underlying rewards in this contextual bandit.
+
+By setting dynamic_rate to None, the rewards are always the same 
+despite the changing states; dynamic_rate == pace randomly changes 
+the arms with each state, and any other values produce further 
+uncorrelated behavior.  This configuration serves as a test bed for 
+the "worst case" scenario for a bandit/reinforcement learner.  It 
+measures the agent's ability to generalize well and/or how it performs 
+when the environment breaks the typical assumptions.
 
 ## Using
 
