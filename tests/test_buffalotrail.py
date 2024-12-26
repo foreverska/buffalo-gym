@@ -35,18 +35,18 @@ def test_multibuffalo_threestates():
     assert obs.dtype == np.float32
     assert obs[0] in (0, 1, 2)
 
-    states = []
+    states = set()
     for _ in range(20):
         obs, reward, done, term, info = env.step(env.action_space.sample())
 
         assert obs.shape == (1,)
         assert obs.dtype == np.float32
         assert obs[0] in (0, 1, 2)
-        states.append(obs[0])
+        states.add(obs[0])
         assert done is False
         assert term is False
 
-    assert set(states) == {0, 1, 2}
+    assert states == {0.0, 1.0, 2.0}
 
 def test_multibuffalo_trail():
     env = gym.make('BuffaloTrail-v0', states=3, pace=1, sequence_length=2, goal_reward=100)
