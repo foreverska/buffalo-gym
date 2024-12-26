@@ -1,3 +1,6 @@
 from buffalo_gym.envs.buffalo_gym import BuffaloEnv
 from buffalo_gym.envs.multibuffalo_gym import MultiBuffaloEnv
 from buffalo_gym.envs.buffalotrail_gym import BuffaloTrailEnv
+from buffalo_gym.envs.symbolicstate_gym import SymbolicStateEnv
+from buffalo_gym.envs.duelingbuffalo_gym import DuelingBuffaloEnv
+from buffalo_gym.envs.boundlessbuffalo_gym import BoundlessBuffaloEnv
