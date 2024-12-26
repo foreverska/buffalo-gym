@@ -1,3 +1,4 @@
+from collections import deque
 from typing import Any, TypeVar, SupportsFloat
 import random
 
@@ -36,17 +37,19 @@ class BuffaloTrailEnv(gym.Env):
         if self.force_aliasing:
             if self.sequence_length < 4:
                 raise RuntimeError("Cannot alias bandit environment with sequence_length < 4")
-            starting = np.random.choice(range(self.arms))
-            alias = np.random.choice(range(self.arms))
+            starting = np.random.choice(range(self.states))
+            alias = np.random.choice(range(self.states))
             self.goal_sequence = [starting, alias, starting, alias + 1]
             for i in range(self.sequence_length - 4):
-                self.goal_sequence.append(np.random.choice(range(self.arms)))
+                self.goal_sequence.append(np.random.choice(range(self.states)))
         else:
-            self.goal_sequence = [np.random.choice(range(self.arms)) for _ in range(self.sequence_length)]
+            self.goal_sequence = [np.random.choice(range(self.states)) for _ in range(self.sequence_length)]
 
-    def __init__(self, arms: int = 10, optimal_arms: int | list[int] = 1,
+        self.goal_action = random.choice(range(self.arms))
+
+    def __init__(self, arms: int = 10, states: int = 2, optimal_arms: int | list[int] = 1,
                  sequence_length: int = 5, force_aliasing: bool = False, goal_reward: float = 100.0,
-                 dynamic_rate: int | None = None, goal_rate: int | None = None,
+                 dynamic_rate: int | None = None, pace: int = 5, goal_rate: int | None = None,
                  seed: int | None = None, optimal_mean: float = 10, optimal_std: float = 1,
                  min_suboptimal_mean: float = 0, max_suboptimal_mean: float = 5,
                  suboptimal_std: float = 1):
@@ -58,6 +61,7 @@ class BuffaloTrailEnv(gym.Env):
         :param force_aliasing: force the aliasing of the bandit environment
         :param goal_reward: the reward of the hidden sequence
         :param dynamic_rate: number of steps between drawing new arm means, None means no dynamic rate
+        :param pace: number of steps between drawing a new state
         :param goal_rate: number of steps between drawing new secret sequence, None means goal does not change
         :param seed: random seed
         :param optimal_mean: mean of optimal arms
@@ -67,8 +71,9 @@ class BuffaloTrailEnv(gym.Env):
         :param suboptimal_std: std of suboptimal arms
         """
         self.arms = arms
-        self.states = arms
+        self.states = states
         self.dynamic_rate = dynamic_rate
+        self.pace = pace
         self.goal_rate = goal_rate
         self.initial_seed = seed
         self.seed = seed
@@ -92,7 +97,7 @@ class BuffaloTrailEnv(gym.Env):
         self.ssr = 0
         self.state = 0
 
-        self.visited = []
+        self.visited = deque([], maxlen=self.sequence_length)
 
         self.__draw_arms()
         self.__draw_sequence()
@@ -112,12 +117,13 @@ class BuffaloTrailEnv(gym.Env):
         self.pulls = 0
         self.ssr = 0
         self.state = 0
-        self.visited = []
+        self.visited = deque([], maxlen=self.sequence_length)
 
         self.__draw_arms()
         self.__draw_sequence()
 
-        return np.zeros((1,), dtype=np.float32), {'goal': self.goal_sequence, 'offsets': self.offsets}
+        return np.zeros((1,), dtype=np.float32), {'goal': self.goal_sequence, 'goal_action': self.goal_action,
+                                                  'offsets': self.offsets}
 
     def step(self, action: int) -> tuple[ObsType, SupportsFloat, bool, bool, dict[str, Any]]:
         """
@@ -127,14 +133,15 @@ class BuffaloTrailEnv(gym.Env):
         """
         reward = self.rng.normal(self.offsets[0][self.state][action], self.stds[self.state][action], 1)[0]
 
-        self.state = action
         self.visited.append(self.state)
-        if len(self.visited) > len(self.goal_sequence):
-            self.visited.pop(0)
-        if self.visited == self.goal_sequence:
-            reward = self.goal_reward
+        if (sum(1 if a == b else 0 for (a, b) in zip(self.visited, self.goal_sequence)) == self.sequence_length and
+                action == self.goal_action):
+            reward += self.goal_reward
 
         self.ssr += 1
+        if self.pace is None or self.ssr % self.pace == 0:
+            self.state = np.random.randint(0, self.states)
+
         self.pulls += 1
         if self.dynamic_rate is not None and self.pulls % self.dynamic_rate == 0:
             if self.seed is not None:
