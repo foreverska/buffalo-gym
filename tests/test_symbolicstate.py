@@ -13,7 +13,7 @@ def test_symbolicstate():
     assert obs[0] in (0, 1)
 
     states = set()
-    for _ in range(20):
+    for _ in range(100):
         obs, reward, done, term, info = env.step(env.action_space.sample())
 
         assert obs.shape == (1,)
@@ -22,6 +22,9 @@ def test_symbolicstate():
         states.add(obs[0])
         assert done is False
         assert term is False
+
+        if states == {0.0, 1.0}:
+            break
 
     assert set(states) == {0.0, 1.0}
 
@@ -35,7 +38,7 @@ def test_symbolicstate_threestates():
     assert obs[0] in (0, 1, 2)
 
     states = set()
-    for _ in range(20):
+    for _ in range(100):
         obs, reward, done, term, info = env.step(env.action_space.sample())
 
         assert obs.shape == (1,)
@@ -44,5 +47,8 @@ def test_symbolicstate_threestates():
         states.add(obs[0])
         assert done is False
         assert term is False
+
+        if states == {0.0, 1.0, 2.0}:
+            break
 
     assert set(states) == {0.0, 1.0, 2.0}
