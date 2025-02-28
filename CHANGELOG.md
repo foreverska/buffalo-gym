@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.3.0] - 2025-02-27
+
+## Added
+
+- TiredBuffalo -- FatigueBandit
+
+### Changed
+
+- Minor fixes for warnings in pytest from gym checker
+
 ## [0.2.0] - 2024-12-26
 
 ### Added

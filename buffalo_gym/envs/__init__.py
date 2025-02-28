@@ -4,3 +4,4 @@ from buffalo_gym.envs.buffalotrail_gym import BuffaloTrailEnv
 from buffalo_gym.envs.symbolicstate_gym import SymbolicStateEnv
 from buffalo_gym.envs.duelingbuffalo_gym import DuelingBuffaloEnv
 from buffalo_gym.envs.boundlessbuffalo_gym import BoundlessBuffaloEnv
+from buffalo_gym.envs.fatiguebandit_gym import FatigueBanditEnv
