@@ -65,3 +65,15 @@ register(
     entry_point='buffalo_gym.envs:BuffaloTrailEnv',
     max_episode_steps=1000
 )
+
+register(
+    id='FatigueBandit-v0',
+    entry_point='buffalo_gym.envs:FatigueBanditEnv',
+    max_episode_steps=1000
+)
+
+register(
+    id='TiredBuffalo-v0',
+    entry_point='buffalo_gym.envs:FatigueBanditEnv',
+    max_episode_steps=1000
+)

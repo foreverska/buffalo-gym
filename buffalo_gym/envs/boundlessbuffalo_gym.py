@@ -60,7 +60,7 @@ class BoundlessBuffaloEnv(gym.Env):
         :param action: One of infinite arms to pull in (-inf, +inf)
         :return: observation, reward, done, term, info
         """
-        arm = action / np.sqrt(1 + np.power(action, 2))
+        arm = (action / np.sqrt(1 + np.power(action, 2)))[0]
         reward = sum([c * np.power(arm, n) for n, c in enumerate(self.coefficients)])
         reward += self.rng.normal(self.std_deviation)
 
