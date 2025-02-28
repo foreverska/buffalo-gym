@@ -10,6 +10,8 @@ and write an MAB to debug my DQN agent.  But there was a lack
 of native gymnasium environments, so I wrote Buffalo, an easy-to-use 
  environment that it might help someone else.
 
+## Check out the [WIKI](https://github.com/foreverska/buffalo-gym/wiki) for fuller documentation.
+
 ## Standard Bandit Problems
 
 ### Buffalo ("Buffalo-v0" | "Bandit-v0")
@@ -88,6 +90,20 @@ uncorrelated behavior.  This configuration serves as a test bed for
 the "worst case" scenario for a bandit/reinforcement learner.  It 
 measures the agent's ability to generalize well and/or how it performs 
 when the environment breaks the typical assumptions.
+
+### Tired Buffalo ("TiredBuffalo-v0" | "FatigueBandit-v0")
+
+I asked ChatGPT for a novel bandit formulation.  This bandit is what 
+it came up with.  It's hardly novel, though, as it is a special case 
+of the "Recovering Bandits" (Pike-Burke & Grünewälder, 2019) problem
+where all arms have the same function.  It's on the list of 
+non-standard bandits because it's not their problem, but it's hardly 
+new.
+
+This bandit problem models resource depletion and recovery. Pulling an arm 
+reduces its expected reward ("fatigue"), while unused arms gradually recover. 
+Each arm has a unique maximum mean reward, requiring the agent to balance 
+immediate rewards against long-term sustainability.
 
 ## Using
 

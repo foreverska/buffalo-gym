@@ -91,7 +91,7 @@ class BuffaloTrailEnv(gym.Env):
         self.optimal_arms = optimal_arms
 
         self.action_space = gym.spaces.Discrete(arms)
-        self.observation_space = gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32)
+        self.observation_space = gym.spaces.Box(low=0, high=self.states, shape=(1,), dtype=np.float32)
 
         self.pulls = 0
         self.ssr = 0
