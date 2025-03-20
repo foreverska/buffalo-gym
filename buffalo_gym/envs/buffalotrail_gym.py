@@ -113,7 +113,7 @@ class BuffaloTrailEnv(gym.Env):
         :return: observation, info
         """
 
-        self.seed = self.initial_seed
+        self.seed = seed
         self.pulls = 0
         self.ssr = 0
         self.state = 0
