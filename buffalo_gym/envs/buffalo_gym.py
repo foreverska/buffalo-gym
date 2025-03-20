@@ -69,7 +69,7 @@ class BuffaloEnv(gym.Env):
         :return: observation, info
         """
 
-        self.seed = self.initial_seed
+        self.seed = seed
         self.pulls = 0
         self.__draw_arms()
 
