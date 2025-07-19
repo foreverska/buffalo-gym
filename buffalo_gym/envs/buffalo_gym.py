@@ -20,14 +20,16 @@ class BuffaloEnv(gym.Env):
         """
         self.rng = np.random.default_rng(self.seed)
         optimal_arms = self.rng.choice(range(self.arms), self.optimal_arms, replace=False)
-        self.offsets = np.random.uniform(self.min_suboptimal_mean, self.max_suboptimal_mean, size=(1, self.arms))
+        self.offset_targets = self.rng.uniform(self.min_suboptimal_mean, self.max_suboptimal_mean, size=(1, self.arms))
+        self.offset_speed = 0
         for arm in optimal_arms:
-            self.offsets[0, arm] = self.optimal_mean
+            self.offset_targets[0][arm] = self.optimal_mean
         self.stds = [self.optimal_std if x in optimal_arms else self.suboptimal_std for x in range(self.arms)]
 
     def __init__(self, arms: int = 10, optimal_arms: int = 1, dynamic_rate: int | None = None, seed: int | None = None,
                  optimal_mean: float = 10, optimal_std: float = 1,
-                 min_suboptimal_mean: float = 0, max_suboptimal_mean: float = 5, suboptimal_std: float = 1):
+                 min_suboptimal_mean: float = 0, max_suboptimal_mean: float = 5, suboptimal_std: float = 1,
+                 arm_acceleration: float = 10):
         """
         Multi-armed bandit environment with k-static valued arms
         :param arms: number of arms
@@ -39,11 +41,11 @@ class BuffaloEnv(gym.Env):
         :param min_suboptimal_mean: min mean of suboptimal arms
         :param max_suboptimal_mean: max mean of suboptimal arms
         :param suboptimal_std: std of suboptimal arms
+        :param arm_acceleration: acceleration per step towards target arm values
         """
         self.arms = arms
         self.optimal_arms = optimal_arms
         self.dynamic_rate = dynamic_rate
-        self.initial_seed = seed
         self.seed = seed
         self.optimal_mean = optimal_mean
         self.optimal_std = optimal_std
@@ -55,6 +57,8 @@ class BuffaloEnv(gym.Env):
         self.observation_space = gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32)
 
         self.pulls = 0
+        self.offsets = np.zeros((1, self.arms))
+        self.offset_acceleration = arm_acceleration
 
         self.__draw_arms()
 
@@ -75,12 +79,30 @@ class BuffaloEnv(gym.Env):
 
         return np.zeros((1,), dtype=np.float32), {"offsets": self.offsets}
 
+    def move_means(self):
+        """
+        Move arm means towards their targets
+        """
+        offsets = self.offsets[0]
+        targets = self.offset_targets[0]
+        delta = targets - offsets
+
+        if not np.allclose(offsets, targets):
+            direction = np.sign(delta)
+            self.offset_speed += self.offset_acceleration
+            new_offsets = offsets + self.offset_speed * direction
+
+            overshot = np.sign(targets - new_offsets) != direction
+            offsets[:] = np.where(overshot, targets, new_offsets)
+
     def step(self, action: int) -> tuple[ObsType, SupportsFloat, bool, bool, dict[str, Any]]:
         """
         Steps the environment
         :param action: arm to pull
         :return: observation, reward, done, term, info
         """
+        self.move_means()
+
         reward = self.rng.normal(self.offsets[0][action], self.stds[action], 1)[0]
 
         self.pulls += 1

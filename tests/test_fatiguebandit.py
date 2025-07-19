@@ -1,12 +1,13 @@
 import pytest
 import gymnasium as gym
 import numpy as np
-import buffalo_gym.envs.fatiguebandit_gym
+from buffalo_gym.envs.fatiguebandit_gym import FatigueBanditEnv
+
 
 def test_fatigue_bandit_initialization():
     """Test if the Fatigue Bandit initializes correctly."""
-    env = gym.make("FatigueBandit-v0", arms=5, base_mean=10.0, mean_variability=2.0,
-                   fatigue_rate=1.0, recovery_rate=0.5, min_reward=0.0, reward_std=1.0, seed=42)
+    env = FatigueBanditEnv(arms=5, base_mean=10.0, mean_variability=2.0,
+                           fatigue_rate=1.0, recovery_rate=0.5, min_reward=0.0, reward_std=1.0, seed=42)
 
     env.reset()
     assert env.arms == 5
@@ -35,8 +36,8 @@ def test_fatigue_bandit_step():
 
 def test_fatigue_bandit_recovery():
     """Test if arms recover correctly over time when not selected."""
-    env = gym.make("FatigueBandit-v0", arms=2, base_mean=10.0, mean_variability=0,
-                   fatigue_rate=1.0, recovery_rate=0.5, min_reward=0.0, reward_std=1.0, seed=42)
+    env = FatigueBanditEnv(arms=2, base_mean=10.0, mean_variability=0,
+                           fatigue_rate=1.0, recovery_rate=0.5, min_reward=0.0, reward_std=1.0, seed=42)
     env.reset()
     env.step(0)  # Fatigue arm 0
     env.step(1)  # Fatigue arm 1, arm 0 should recover slightly
@@ -45,7 +46,7 @@ def test_fatigue_bandit_recovery():
 
 def test_fatigue_bandit_reset():
     """Test if resetting the environment restores initial conditions."""
-    env = gym.make("FatigueBandit-v0", arms=4, seed=42)
+    env = FatigueBanditEnv(arms=4, seed=42)
     env.reset()
     env.step(2)
     env.reset()
