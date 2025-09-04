@@ -19,7 +19,7 @@ class SymbolicStateEnv(gym.Env):
         Draw new arms
         """
         self.rng = np.random.default_rng(self.seed)
-        self.offsets = np.random.uniform(self.min_suboptimal_mean, self.max_suboptimal_mean,
+        self.offsets = self.rng.uniform(self.min_suboptimal_mean, self.max_suboptimal_mean,
                                          size=self.arms)
 
         optimal_arms = self.rng.choice(range(self.arms), self.optimal_arms, replace=False)

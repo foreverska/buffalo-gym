@@ -20,7 +20,7 @@ class BuffaloEnv(gym.Env):
         """
         self.rng = np.random.default_rng(self.seed)
         optimal_arms = self.rng.choice(range(self.arms), self.optimal_arms, replace=False)
-        self.offsets = np.random.uniform(self.min_suboptimal_mean, self.max_suboptimal_mean, size=(1, self.arms))
+        self.offsets = self.rng.uniform(self.min_suboptimal_mean, self.max_suboptimal_mean, size=(1, self.arms))
         for arm in optimal_arms:
             self.offsets[0, arm] = self.optimal_mean
         self.stds = [self.optimal_std if x in optimal_arms else self.suboptimal_std for x in range(self.arms)]
