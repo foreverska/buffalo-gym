@@ -20,7 +20,7 @@ class BuffaloTrailEnv(gym.Env):
         Draw new arms
         """
         self.rng = np.random.default_rng(self.seed)
-        self.offsets = np.random.uniform(self.min_suboptimal_mean, self.max_suboptimal_mean,
+        self.offsets = self.rng.uniform(self.min_suboptimal_mean, self.max_suboptimal_mean,
                                          size=(1, self.states, self.arms))
 
         self.stds = []

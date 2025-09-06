@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.0] - 2025-09-05
+
+- Buffalo/Bandit now includes parameter for enable slowly varying bandits
+- Greater reproducibility thanks to @anyinlover
+
 ## [0.3.1] - 2025-03-19
 
 ### Changed
